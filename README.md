@@ -1,2 +1,2 @@
 # Charged-Up
-The official GitHub repository of Team 5243 for the FRC 2023 season - Charged Up
+Official GitHub Repository of FRC Team 5243 (Aegis Robotics) for FIRST Charged Up (2023)
