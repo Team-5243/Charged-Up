@@ -28,7 +28,7 @@ public class RobotContainer {
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
 
   private final DriveCommand m_driveCommand = new DriveCommand(m_driveSubsystem);
-  //private final ArmCommand m_armCommand = new ArmCommand(m_armSubsystem);
+  private final ArmCommand m_armCommand = new ArmCommand(m_armSubsystem);
 
   //private final PneumaticsSubsystem m_pneumaticsSubsystem = new PneumaticsSubsystem();
   //private final PneumaticsCommand m_pneumaticsCommand = new PneumaticsCommand(m_pneumaticsSubsystem);
@@ -62,5 +62,13 @@ public class RobotContainer {
   // public PneumaticsSubsystem getM_pneumaticsSubsystem() {
   //     return null;
   // }
+
+  public Command getDriveCommand() {
+    return m_driveCommand;
+  }
+
+  public Command getArmCommand() {
+    return m_armCommand;
+  }
 
 }
