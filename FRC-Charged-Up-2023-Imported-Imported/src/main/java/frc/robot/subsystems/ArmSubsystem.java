@@ -12,10 +12,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 public class ArmSubsystem extends SubsystemBase {
 
   private CANSparkMax arm;
+  private CANSparkMax extend;
   private RelativeEncoder m_encoder;
 
   public ArmSubsystem() {
     arm = new CANSparkMax(Constants.ARMCAN, MotorType.kBrushless);
+    extend= new CANSparkMax(Constants.EXTENDCAN, MotorType.kBrushless);
     // arm.setInverted(true);
     m_encoder = arm.getEncoder(); 
 }
@@ -29,6 +31,10 @@ public class ArmSubsystem extends SubsystemBase {
     } else {
       arm.set(0);
     }
+  }
+
+  public void extendController(){
+    extend.set(Constants.RIGHTJOY.getY());
   }
 
   public double getDegPos() {

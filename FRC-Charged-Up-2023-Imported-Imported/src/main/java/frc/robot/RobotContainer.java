@@ -8,10 +8,11 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.PneumaticsCommand;
 import frc.robot.subsystems.ArmSubsystem;
 //import frc.robot.commands.PneumaticsCommand;
 import frc.robot.subsystems.DriveSubsystem;
-//import frc.robot.subsystems.PneumaticsSubsystem;
+import frc.robot.subsystems.PneumaticsSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 //import edu.wpi.first.wpilibj2.command.Subsystem;
 //import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -26,9 +27,11 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+  private final PneumaticsSubsystem m_pneumaticsSubsystem = new PneumaticsSubsystem();
 
   private final DriveCommand m_driveCommand = new DriveCommand(m_driveSubsystem);
   private final ArmCommand m_armCommand = new ArmCommand(m_armSubsystem);
+  private final PneumaticsCommand m_pneumaticsCommand= new PneumaticsCommand(m_pneumaticsSubsystem);
 
   //private final PneumaticsSubsystem m_pneumaticsSubsystem = new PneumaticsSubsystem();
   //private final PneumaticsCommand m_pneumaticsCommand = new PneumaticsCommand(m_pneumaticsSubsystem);
@@ -69,6 +72,10 @@ public class RobotContainer {
 
   public Command getArmCommand() {
     return m_armCommand;
+  }
+
+  public Command getPneumaticsCommand() {
+    return m_pneumaticsCommand;
   }
 
 }
