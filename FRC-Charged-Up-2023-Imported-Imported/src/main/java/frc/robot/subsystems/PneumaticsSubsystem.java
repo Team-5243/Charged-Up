@@ -4,14 +4,10 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.PneumaticsCommand;
@@ -23,38 +19,8 @@ public class PneumaticsSubsystem extends SubsystemBase {
   public PneumaticsSubsystem() {
     pcmCompressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
     pcmCompressor.enableDigital();
-    exampleDoublePCM = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 2, 1);
+    exampleDoublePCM = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.PENUMATIC_IN, Constants.PENUMATIC_OUT);
     exampleDoublePCM.set(Value.kOff);
-  }
-
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
-  public CommandBase exampleMethodCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
-  }
-
-  /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-   *
-   * @return value of some boolean subsystem state, such as a digital sensor.
-   */
-  public boolean exampleCondition() {
-    // Query some boolean state, such as a digital sensor.
-    return false;
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Penumatics");
-    builder.addDoubleProperty("Actuations", this::getCount, this::setCount);
   }
 
   public void extend(){
@@ -79,8 +45,6 @@ public class PneumaticsSubsystem extends SubsystemBase {
       count = 0;
     }
   }
-
-
 
   @Override
   public void periodic() {

@@ -15,6 +15,7 @@ public class PneumaticsCommand extends CommandBase {
   public PneumaticsCommand(PneumaticsSubsystem subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_subsystem= subsystem;
+    addRequirements(subsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -27,9 +28,7 @@ public class PneumaticsCommand extends CommandBase {
     m_subsystem.extend();
     m_subsystem.retract();
     m_subsystem.toggle();
-
     SmartDashboard.putNumber("Actuations",m_subsystem.getCount());
-
   }
 
   // Called once the command ends or is interrupted.

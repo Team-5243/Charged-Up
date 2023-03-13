@@ -74,8 +74,8 @@ public class RobotContainer {
     return m_armCommand;
   }
 
-  public Command getPneumaticsCommand() {
-    return m_pneumaticsCommand;
-  }
+  // public Command getPneumaticsCommand() {
+  //   return m_pneumaticsCommand;
+  // }
 
 }

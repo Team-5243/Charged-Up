@@ -28,6 +28,7 @@ public class ArmCommand extends CommandBase {
   public void execute() {
     m_subsystem.armController();
     m_subsystem.extendController();
+    m_subsystem.perfect90();
     SmartDashboard.putNumber("Arm Degree Position", m_subsystem.getDegPos());
   }
 

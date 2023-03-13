@@ -24,8 +24,8 @@ public final class Constants {
     public static int BRCAN=2;
     public static int EXTENDCAN=5;
     public static int ARMCAN=6;
-    // public static int PENUMATIC_A = 2;
-    // public static int PENUMATIC_B = 1;
+    public static int PENUMATIC_IN = 6;
+    public static int PENUMATIC_OUT = 7;
 
     public static Joystick LEFTJOY = new Joystick(0);
     public static Joystick RIGHTJOY = new Joystick(1);
