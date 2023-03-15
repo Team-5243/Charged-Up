@@ -31,6 +31,12 @@ public final class Constants {
     public static Joystick RIGHTJOY = new Joystick(1);
     //public static Joystick RIGHTJOY = new Joystick(0);
 
+    public static double KP_ARM = 0.05;
+    public static double KS_ARM = 0.2;
+    public static double ARM_CONTROL_SCALAR = 5;
+    public static double ARM_DEG_TOL = 5;
+
+
     // Robot Physical Constants
     public static double DRIVE_R = .14;
     public static double DRIVE_TRACT = .66;

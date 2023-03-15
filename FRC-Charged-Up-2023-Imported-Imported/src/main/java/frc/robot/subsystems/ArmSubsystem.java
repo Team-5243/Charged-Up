@@ -14,6 +14,7 @@ public class ArmSubsystem extends SubsystemBase {
   private CANSparkMax arm;
   private CANSparkMax extend;
   private RelativeEncoder m_encoder;
+  double targetPos = 0;
 
   public ArmSubsystem() {
     arm = new CANSparkMax(Constants.ARMCAN, MotorType.kBrushless);
@@ -42,7 +43,7 @@ public class ArmSubsystem extends SubsystemBase {
     return m_encoder.getPosition()*(360/42);
   }
 
-  public void perfect90(){
+  public void perfect45(){
     if(Constants.LEFTJOY.getRawButton(7)){
       if(getDegPos()>50){
         arm.set(-.1);
@@ -54,13 +55,22 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  public void PIDArm(double degPos, double tolerance) {
+    double e = degPos - getDegPos();
+    if (Math.abs(e) < tolerance) {
+      arm.set(Constants.KP_ARM*e + Constants.KS_ARM*Math.sin(Math.toRadians(getDegPos())));
+    }
+  }
 
+  public void PIDArmController() {
+    targetPos += Constants.RIGHTJOY.getY()*Constants.ARM_CONTROL_SCALAR;
+    targetPos = Math.max(5, Math.min(targetPos, 85));
+    PIDArm(targetPos, Constants.ARM_DEG_TOL);
+  }
 
   @Override
   public void periodic() {  
    setDefaultCommand(new ArmCommand(this));
-   System.out.println(m_encoder.getPosition());
-   System.out.println(m_encoder.getVelocity());
   }
 
 
