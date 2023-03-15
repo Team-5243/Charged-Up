@@ -28,8 +28,9 @@ public class ArmCommand extends CommandBase {
   public void execute() {
     m_subsystem.armController();
     m_subsystem.extendController();
-    m_subsystem.perfect45();
-    SmartDashboard.putNumber("Arm Degree Position", m_subsystem.getDegPos());
+    //m_subsystem.perfect45();
+    SmartDashboard.putNumber("Arm Degree Position", m_subsystem.getArmDegPos());
+    SmartDashboard.putNumber("Extension Degree Position", m_subsystem.getExtendDegPos());
   }
 
   // Called once the command ends or is interrupted.

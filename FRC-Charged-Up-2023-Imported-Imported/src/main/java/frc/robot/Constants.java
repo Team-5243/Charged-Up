@@ -33,8 +33,14 @@ public final class Constants {
 
     public static double KP_ARM = 0.05;
     public static double KS_ARM = 0.2;
+    public static double KP_EXTEND = 0.05;
+    public static double KS_EXTEND = 0.2;
     public static double ARM_CONTROL_SCALAR = 5;
     public static double ARM_DEG_TOL = 5;
+    public static double EXTEND_CONTROL_SCALAR = 5;
+    public static double EXTEND_DEG_TOL = 5;
+    public static double ARM_LIMIT = 90;
+    public static double EXTENT_LIMIT = 90;
 
 
     // Robot Physical Constants
