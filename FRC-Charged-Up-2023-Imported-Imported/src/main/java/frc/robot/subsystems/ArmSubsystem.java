@@ -75,7 +75,6 @@ private RelativeEncoder m_ExtendEncoder;
     if (Constants.RIGHTJOY.getTrigger()) {
       targetPosARM -= Constants.ARM_CONTROL_SCALAR; 
     }
-    
     targetPosARM = Math.max(5, Math.min(targetPosARM, Constants.ARM_LIMIT));
     PIDArm(targetPosARM, Constants.ARM_DEG_TOL);
   }

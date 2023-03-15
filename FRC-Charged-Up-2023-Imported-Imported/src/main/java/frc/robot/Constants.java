@@ -40,7 +40,7 @@ public final class Constants {
     public static double EXTEND_CONTROL_SCALAR = 5;
     public static double EXTEND_DEG_TOL = 5;
     public static double ARM_LIMIT = 90;
-    public static double EXTENT_LIMIT = 90;
+    public static double EXTENT_LIMIT = 180;
 
 
     // Robot Physical Constants
