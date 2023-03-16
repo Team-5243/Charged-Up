@@ -21,7 +21,7 @@ private RelativeEncoder m_ExtendEncoder;
   public ArmSubsystem() {
     arm = new CANSparkMax(Constants.ARMCAN, MotorType.kBrushless);
     extend= new CANSparkMax(Constants.EXTENDCAN, MotorType.kBrushless);
-    // arm.setInverted(true);
+     extend.setInverted(true);
     m_ArmEncoder = arm.getEncoder(); 
     m_ArmEncoder.setPosition(0);
 
@@ -69,13 +69,13 @@ private RelativeEncoder m_ExtendEncoder;
 
 
   public void PIDArmController() {   
-    if (Constants.LEFTJOY.getTrigger()) {
+    /*if (Constants.LEFTJOY.getTrigger()) {
       targetPosARM += Constants.ARM_CONTROL_SCALAR; 
     }
     if (Constants.RIGHTJOY.getTrigger()) {
       targetPosARM -= Constants.ARM_CONTROL_SCALAR; 
-    }
-    targetPosARM = Math.max(5, Math.min(targetPosARM, Constants.ARM_LIMIT));
+    }*/
+    targetPosARM = Math.max(5, Math.min((1 -Constants.RIGHTJOY.getRawAxis(0))/2, Constants.ARM_LIMIT));
     PIDArm(targetPosARM, Constants.ARM_DEG_TOL);
   }
 

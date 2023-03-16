@@ -26,12 +26,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
-  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
-  private final PneumaticsSubsystem m_pneumaticsSubsystem = new PneumaticsSubsystem();
+  // // private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+  // private final PneumaticsSubsystem m_pneumaticsSubsystem = new PneumaticsSubsystem();
 
   private final DriveCommand m_driveCommand = new DriveCommand(m_driveSubsystem);
-  private final ArmCommand m_armCommand = new ArmCommand(m_armSubsystem);
-  private final PneumaticsCommand m_pneumaticsCommand= new PneumaticsCommand(m_pneumaticsSubsystem);
+  // // private final ArmCommand m_armCommand = new ArmCommand(m_armSubsystem);
+  // private final PneumaticsCommand m_pneumaticsCommand= new PneumaticsCommand(m_pneumaticsSubsystem);
 
   //private final PneumaticsSubsystem m_pneumaticsSubsystem = new PneumaticsSubsystem();
   //private final PneumaticsCommand m_pneumaticsCommand = new PneumaticsCommand(m_pneumaticsSubsystem);
@@ -71,9 +71,9 @@ public class RobotContainer {
     return m_driveCommand;
   }
 
-  public Command getArmCommand() {
-    return m_armCommand;
-  }
+  // public Command getArmCommand() {
+  //   return m_armCommand;
+  // }
 
   // public Command getPneumaticsCommand() {
   //   return m_pneumaticsCommand;

@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.DriveCommand;
@@ -22,6 +23,7 @@ public class DriveSubsystem extends SubsystemBase {
   public DifferentialDrive diffDrive;
   public double x = 0, y = 0, t = 0, fl_0 = 0, fr_0 = 0, bl_0 = 0, br_0 = 0, dt = 0;
   public Timer time;
+  RelativeEncoder[] Encs;
 /*fdshfhdjshfhgtjvddsgsjfhdisjgdfgsdjglsfhdsjfshfsdjiotfds System.Out.Println("L") */
   /** Creates a new ExampleSubsystem. */
   public DriveSubsystem() {
@@ -51,11 +53,31 @@ public class DriveSubsystem extends SubsystemBase {
     flEnc = fl.getEncoder();
     frEnc = fr.getEncoder();
     blEnc = bl.getEncoder();
-    brEnc = br.getEncoder();    
+    brEnc = br.getEncoder();
+    
+    RelativeEncoder[] EncsA = {flEnc, frEnc, blEnc, brEnc};
+
+    Encs = EncsA;
+
+    for (RelativeEncoder enc : Encs) {
+      enc.setPosition(0);
+      //enc.setPositionConversionFactor(-1);
+    }
 
     diffDrive= new DifferentialDrive(left, right);
     
     time = new Timer();
+    time.start();
+  }
+
+
+
+  public void resetPos() {
+    x = 0; y = 0; t = 0;
+    for (RelativeEncoder enc : Encs) {
+      enc.setPosition(0);
+      //enc.setPositionConversionFactor(-1);
+    }
   }
 
   public double lowPassFilter(double lpf, double f, double i) {
@@ -120,15 +142,20 @@ public class DriveSubsystem extends SubsystemBase {
 }
 
 public void stateUpdater() {
-  dt = 0.01; //time.get();
+  dt = time.get();
   double fl_1 = (lowPassFilter(1, flEnc.getPosition(), fl_0) - fl_0)/dt;
   double fr_1 = (lowPassFilter(1, frEnc.getPosition(), fr_0) - fr_0)/dt;
   double bl_1 = (lowPassFilter(1, blEnc.getPosition(), bl_0) - bl_0)/dt;
   double br_1 = (lowPassFilter(1, brEnc.getPosition(), br_0) - br_0)/dt;
 
-  double x_dot = 2*3.14*Constants.DRIVE_R*(fl_1 + bl_1 + br_1 + fr_1) / 4;
+  SmartDashboard.putNumber("FL", flEnc.getPosition());
+  SmartDashboard.putNumber("FR", frEnc.getPosition());
+  SmartDashboard.putNumber("BL", blEnc.getPosition());
+  SmartDashboard.putNumber("BR", brEnc.getPosition());
+
+  double x_dot = -2*3.14*Constants.DRIVE_R*(fl_1 + bl_1 + br_1 + fr_1) / 4;
   double y_dot = 0; //Constants.DRIVE_R*(fl_1 - bl_1 + br_1 - fr_1) / 4;
-  double a_dot = Constants.DRIVE_R*(bl_1 + fl_1 - fr_1 - br_1) / (3.14 * Constants.DRIVE_TRACT);
+  double a_dot = -Constants.DRIVE_R*(bl_1 + fl_1 - fr_1 - br_1) / (4 * Constants.DRIVE_TRACT);
 
   t += a_dot*dt;
 
@@ -145,14 +172,14 @@ public void stateUpdater() {
   fr_0 += fr_1*dt;
   bl_0 += bl_1*dt;
   br_0 += br_1*dt;
-  time.reset();
+  time.restart();
 }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     setDefaultCommand(new DriveCommand(this));
-    //stateUpdater();
+    stateUpdater();
   }
 
   public double getX() {
@@ -166,6 +193,10 @@ public void stateUpdater() {
   public double getT() {
       return t;
   }
+
+  public double getTDeg() {
+    return Math.toDegrees(t);
+}
 
   @Override
   public void simulationPeriodic() {
