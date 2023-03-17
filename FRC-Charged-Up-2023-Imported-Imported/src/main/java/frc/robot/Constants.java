@@ -31,6 +31,9 @@ public final class Constants {
     public static Joystick RIGHTJOY = new Joystick(1);
     //public static Joystick RIGHTJOY = new Joystick(0);
 
+    public static double KP_DRIVE_R = 1;
+    public static double KP_DRIVE_X = 1;
+
     public static double KP_ARM = 0.05;
     public static double KS_ARM = 0.2;
     public static double KP_EXTEND = 0.05;
@@ -41,11 +44,13 @@ public final class Constants {
     public static double EXTEND_DEG_TOL = 5;
     public static double ARM_LIMIT = 90;
     public static double EXTENT_LIMIT = 180;
+    public static double ARM_KS= 0.13/360;
 
 
     // Robot Physical Constants
-    public static double DRIVE_R = .14;
-    public static double DRIVE_TRACT = .66;
-
-
+    public static double DRIVE_R = 3; // inches
+    public static double DRIVE_L_GR = 3.5; // inches
+    public static double DRIVE_R_GR = 8.5; // inches
+    public static double DRIVE_InTk = 53./24; // inches
+    public static double DRIVE_TRACT = 19; // inches
 }

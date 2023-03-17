@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -33,7 +34,11 @@ public class DriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.arcadeDrive();
+    if (Constants.LEFTJOY.getRawButton(6)) {
+      m_subsystem.driveToPoint(12*10, 0, 0, 6, 5);
+    } else {
+      m_subsystem.arcadeDrive();
+    }
     //m_subsystem.armMoveBetter();
     //m_subsystem.leftPivot();
     SmartDashboard.putNumber("X", m_subsystem.getX());

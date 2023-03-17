@@ -21,7 +21,9 @@ public class ArmCommand extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_subsystem.EncZeroer();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -29,8 +31,10 @@ public class ArmCommand extends CommandBase {
     m_subsystem.armController();
     m_subsystem.extendController();
     m_subsystem.perfect45();
+    m_subsystem.EncZeroer();
     SmartDashboard.putNumber("Arm Degree Position", m_subsystem.getArmDegPos());
     SmartDashboard.putNumber("Extension Degree Position", m_subsystem.getExtendDegPos());
+    SmartDashboard.putNumber("Power Set to ARm", m_subsystem.getArmPower());
   }
 
   // Called once the command ends or is interrupted.

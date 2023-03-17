@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.DriveRotate;
 
 public class DriveSubsystem extends SubsystemBase {
   public CANSparkMax fr, fl, br, bl,ARM;
@@ -24,18 +25,19 @@ public class DriveSubsystem extends SubsystemBase {
   public double x = 0, y = 0, t = 0, fl_0 = 0, fr_0 = 0, bl_0 = 0, br_0 = 0, dt = 0;
   public Timer time;
   RelativeEncoder[] Encs;
+  int drivePhase = 0;
 /*fdshfhdjshfhgtjvddsgsjfhdisjgdfgsdjglsfhdsjfshfsdjiotfds System.Out.Println("L") */
   /** Creates a new ExampleSubsystem. */
   public DriveSubsystem() {
     fl = new CANSparkMax(Constants.FLCAN, MotorType.kBrushless);
-    fl.setInverted(true);
     fr = new CANSparkMax(Constants.FRCAN, MotorType.kBrushless);
     //fr.setInverted(true);
     br = new CANSparkMax(Constants.BRCAN, MotorType.kBrushless);
     //br.setInverted(true);
     bl = new CANSparkMax(Constants.BLCAN, MotorType.kBrushless);
     //ARM= new CANSparkMax(Constants.ARMCAN, MotorType.kBrushless);
-    bl.setInverted(true);
+    //br.setInverted(true);
+    //fr.setInverted(true);
     //ARM.set(0);
     
 
@@ -48,7 +50,9 @@ public class DriveSubsystem extends SubsystemBase {
     // bl = new PWMSparkMax(Constants.BLCAN);
 
     MotorControllerGroup left= new MotorControllerGroup(fl, bl);
-    MotorControllerGroup right= new MotorControllerGroup(fr, br);    
+    MotorControllerGroup right= new MotorControllerGroup(fr, br);
+
+    left.setInverted(true);
 
     flEnc = fl.getEncoder();
     frEnc = fr.getEncoder();
@@ -63,6 +67,11 @@ public class DriveSubsystem extends SubsystemBase {
       enc.setPosition(0);
       //enc.setPositionConversionFactor(-1);
     }
+
+    /*flEnc.setPositionConversionFactor(-1);
+    flEnc.setVelocityConversionFactor(-1);
+    blEnc.setPositionConversionFactor(-1);
+    blEnc.setVelocityConversionFactor(-1);*/
 
     diffDrive= new DifferentialDrive(left, right);
     
@@ -80,13 +89,57 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+  public void driveToPoint(double xf, double yf, double tf, double tol, double atol) {
+    double dy = yf - getY();
+    double dx = xf - getX();
+    double ti = Math.atan(dy/dx);
+    atol = Math.toRadians(atol);
+    double e = ti - getT();
+    SmartDashboard.putNumber("DP", drivePhase);
+    if (drivePhase == 0) {
+      if (Math.abs(dy) > tol || Math.abs(dx) > tol || Math.abs(e) > atol) {
+        diffDrive.arcadeDrive(clip(-0.5, 0.5, -Math.hypot(dx, dy)*Constants.KP_DRIVE_X), 
+          clip(-0.15, 0.15, -e*Constants.KP_DRIVE_R));
+        SmartDashboard.putNumber("X", Math.abs(dy));
+      } else {
+        stopDrive();
+        SmartDashboard.putNumber("X", Math.abs(dy));
+        drivePhase++;
+      }
+    } else if (drivePhase == 1) {
+      if (rotateToPoint(tf, Math.toDegrees(atol))) {
+        drivePhase = 0;
+      }
+    }
+  }
+
+  public double clip(double min, double max, double i) {
+    return Math.min(min, Math.max(max, i));
+  }
+
+  public boolean rotateToPoint(double setT, double tolerance) {
+    setT = Math.toRadians(setT);
+    tolerance = Math.toRadians(tolerance);
+    double e = setT - getT();
+    SmartDashboard.putNumber("E", e);
+    if (Math.abs(e) > tolerance) {
+      diffDrive.arcadeDrive(0, clip(-0.4, 0.4, -e*Constants.KP_DRIVE_R));
+      SmartDashboard.putNumber("A", e*Constants.KP_DRIVE_R);
+      return false;
+    } else {
+      SmartDashboard.putNumber("A", 1);
+      stopDrive();
+      return true;
+    }
+  }
+
   public double lowPassFilter(double lpf, double f, double i) {
     return f*lpf + i*(1-lpf);
   }
 
   
   public void arcadeDrive(){
-    diffDrive.arcadeDrive(Constants.LEFTJOY.getY(),Constants.LEFTJOY.getX());
+    diffDrive.arcadeDrive(Constants.LEFTJOY.getY()*.5, Constants.LEFTJOY.getX()*.5);
     
     //fr.set(Constants.LEFTJOY.getY());
   }
@@ -111,7 +164,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void tankDrive(){
-    diffDrive.tankDrive(-Constants.LEFTJOY.getY(), -Constants.LEFTJOY.getX());
+    diffDrive.tankDrive(-Constants.LEFTJOY.getY(), -Constants.RIGHTJOY.getY());
   }
 
   public void leftPivot(){
@@ -153,25 +206,36 @@ public void stateUpdater() {
   SmartDashboard.putNumber("BL", blEnc.getPosition());
   SmartDashboard.putNumber("BR", brEnc.getPosition());
 
-  double x_dot = -2*3.14*Constants.DRIVE_R*(fl_1 + bl_1 + br_1 + fr_1) / 4;
-  double y_dot = 0; //Constants.DRIVE_R*(fl_1 - bl_1 + br_1 - fr_1) / 4;
-  double a_dot = -Constants.DRIVE_R*(bl_1 + fl_1 - fr_1 - br_1) / (4 * Constants.DRIVE_TRACT);
+  double x_dot = Constants.DRIVE_InTk*((fl_1 + bl_1) - (br_1 + fr_1)) / (4);
+  //double y_dot = 0; //Constants.DRIVE_R*(fl_1 - bl_1 + br_1 - fr_1) / 4;
+  double a_dot = Constants.DRIVE_InTk*((bl_1 + fl_1) + (fr_1 + br_1)) / (2*Constants.DRIVE_TRACT);
+
+  // SmartDashboard.putNumber("Xd", x_dot);
+  // SmartDashboard.putNumber("Ad", a_dot);
 
   t += a_dot*dt;
 
-  double xd = x_dot*Math.cos(t) - y_dot*Math.sin(t);
-  double yd = x_dot*Math.sin(t) + y_dot*Math.cos(t);
+  if (t < Math.toRadians(-180)) {
+    t += 2*Math.PI;
+  }
+
+  if (t > Math.toRadians(180)) {
+    t -= 2*Math.PI;
+  }
+
+  double xd = x_dot*Math.cos(t);
+  double yd = x_dot*Math.sin(t);
 
   x_dot = xd;
-  y_dot = yd;
+  double y_dot = yd;
 
   x += x_dot*dt;
   y += y_dot*dt;
 
-  fl_0 += fl_1*dt;
-  fr_0 += fr_1*dt;
-  bl_0 += bl_1*dt;
-  br_0 += br_1*dt;
+  fl_0 = flEnc.getPosition();
+  fr_0 = frEnc.getPosition();
+  bl_0 = blEnc.getPosition();
+  br_0 = brEnc.getPosition();
   time.restart();
 }
 

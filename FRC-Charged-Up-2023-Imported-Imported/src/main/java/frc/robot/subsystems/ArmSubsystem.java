@@ -27,21 +27,36 @@ private RelativeEncoder m_ExtendEncoder;
 
     m_ExtendEncoder= extend.getEncoder();
     m_ExtendEncoder.setPosition(0);
+
+    
 }
 
+  public void EncZeroer(){
+      m_ArmEncoder.setPosition(0);
+    m_ExtendEncoder.setPosition(0);
+  }
   public void armController(){
-    if(Constants.LEFTJOY.getTrigger()){
-      arm.set(0.30);
-    }
-    else if(Constants.RIGHTJOY.getTrigger()){
-      arm.set(-0.30);
-    } else {
-      arm.set(0);
-    }
+    // if(0 <= getDegPos(m_ArmEncoder) && getDegPos(m_ArmEncoder) <= 90){
+      if(Constants.LEFTJOY.getTrigger()){
+        arm.set(0.30);
+      }
+      else if(Constants.RIGHTJOY.getTrigger()){
+        arm.set(-0.30);
+      } else {
+        arm.set(0);
+      }
+    // } else{
+    //   arm.set(0);
+    // }
   }
 
   public void extendController(){
-    extend.set(Constants.RIGHTJOY.getY());
+    if(getExtendDegPos()>=60){
+      System.out.println("STOPPED");
+      extend.set(0);
+    } else{
+      extend.set(0.25*Constants.RIGHTJOY.getY());
+    }
   }
 
   public double getDegPos(RelativeEncoder Enc) {
@@ -50,14 +65,18 @@ private RelativeEncoder m_ExtendEncoder;
 
   public void perfect45(){
     if(Constants.LEFTJOY.getRawButton(7)){
-      if(getDegPos(m_ArmEncoder)>50){
+      if(getDegPos(m_ArmEncoder)>47){
         arm.set(-.1);
-      } else if( getDegPos(m_ArmEncoder)<40){
+      } else if( getDegPos(m_ArmEncoder)<43){
         arm.set(.4);
       } else{
-        arm.set(0.2*Math.sin(getDegPos(m_ArmEncoder)*Math.PI/180));
+        arm.set(Constants.ARM_KS*Math.sin(getDegPos(m_ArmEncoder)*Math.PI/180)*getDegPos(m_ExtendEncoder));
       }
     }
+  }
+
+  public double getArmPower(){
+    return Constants.ARM_KS*Math.sin(getDegPos(m_ArmEncoder)*Math.PI/180)*getDegPos(m_ExtendEncoder);
   }
 
   public void PIDArm(double degPos, double tolerance) {
