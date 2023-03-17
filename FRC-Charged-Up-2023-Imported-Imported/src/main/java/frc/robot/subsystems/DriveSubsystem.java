@@ -95,6 +95,7 @@ public class DriveSubsystem extends SubsystemBase {
     double ti = Math.atan(dy/dx);
     atol = Math.toRadians(atol);
     double e = ti - getT();
+    radAngWrap(e);
     SmartDashboard.putNumber("DP", drivePhase);
     if (drivePhase == 0) {
       if (Math.abs(dy) > tol || Math.abs(dx) > tol || Math.abs(e) > atol) {
@@ -108,6 +109,7 @@ public class DriveSubsystem extends SubsystemBase {
       }
     } else if (drivePhase == 1) {
       if (rotateToPoint(tf, Math.toDegrees(atol))) {
+        stopDrive();
         drivePhase = 0;
       }
     }
@@ -117,13 +119,26 @@ public class DriveSubsystem extends SubsystemBase {
     return Math.min(min, Math.max(max, i));
   }
 
+  public double radAngWrap(double a) {
+    while (a < -Math.PI) {
+      a += 2*Math.PI;
+    }
+
+    while (a > Math.PI) {
+      a -= 2*Math.PI;
+    }
+
+    return a;
+  }
+
   public boolean rotateToPoint(double setT, double tolerance) {
     setT = Math.toRadians(setT);
     tolerance = Math.toRadians(tolerance);
     double e = setT - getT();
+    e = radAngWrap(e);
     SmartDashboard.putNumber("E", e);
     if (Math.abs(e) > tolerance) {
-      diffDrive.arcadeDrive(0, clip(-0.4, 0.4, -e*Constants.KP_DRIVE_R));
+      diffDrive.arcadeDrive(0, clip(-0.4, 0.4, e*Constants.KP_DRIVE_R));
       SmartDashboard.putNumber("A", e*Constants.KP_DRIVE_R);
       return false;
     } else {
@@ -215,13 +230,7 @@ public void stateUpdater() {
 
   t += a_dot*dt;
 
-  if (t < Math.toRadians(-180)) {
-    t += 2*Math.PI;
-  }
-
-  if (t > Math.toRadians(180)) {
-    t -= 2*Math.PI;
-  }
+  t = radAngWrap(t);
 
   double xd = x_dot*Math.cos(t);
   double yd = x_dot*Math.sin(t);

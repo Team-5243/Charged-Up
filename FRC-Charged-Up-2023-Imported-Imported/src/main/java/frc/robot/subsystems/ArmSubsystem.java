@@ -21,14 +21,11 @@ private RelativeEncoder m_ExtendEncoder;
   public ArmSubsystem() {
     arm = new CANSparkMax(Constants.ARMCAN, MotorType.kBrushless);
     extend= new CANSparkMax(Constants.EXTENDCAN, MotorType.kBrushless);
-     extend.setInverted(true);
     m_ArmEncoder = arm.getEncoder(); 
     m_ArmEncoder.setPosition(0);
 
     m_ExtendEncoder= extend.getEncoder();
     m_ExtendEncoder.setPosition(0);
-
-    
 }
 
   public void EncZeroer(){
@@ -51,11 +48,11 @@ private RelativeEncoder m_ExtendEncoder;
   }
 
   public void extendController(){
-    if(getExtendDegPos()>=60){
+    if(-0.25*Constants.RIGHTJOY.getY()<0 && getExtendDegPos()<=-60){
       System.out.println("STOPPED");
       extend.set(0);
     } else{
-      extend.set(0.25*Constants.RIGHTJOY.getY());
+      extend.set(-0.25*Constants.RIGHTJOY.getY());
     }
   }
 
