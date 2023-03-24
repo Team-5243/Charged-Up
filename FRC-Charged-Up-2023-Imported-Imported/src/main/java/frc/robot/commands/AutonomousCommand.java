@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PneumaticsSubsystem;
 
@@ -34,8 +35,14 @@ public class AutonomousCommand extends CommandBase {
     } else if (step == 1 && m_subsystem.timedProfiledDrive(4.2, 0.48, true)) { // Time 3.1 or 6.2
       step++;
     } else if (step == 2) {
-      // m_subsystem.driveToPoint(10*12, 0, 0, 5, 5);    
-      m_subsystem.stopDrive();
+      if(Constants.gyro.getPitch()>=70){
+        step++;
+      }
+       m_subsystem.diffDrive.arcadeDrive(0.75, 0);  
+    } else if(step==3){
+      if(Constants.gyro.getPitch()<=60){
+        m_subsystem.stopDrive();
+      }
     }
   }
 
