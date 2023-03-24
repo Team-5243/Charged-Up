@@ -24,7 +24,7 @@ public class PneumaticsSubsystem extends SubsystemBase {
   }
 
   public void extend(){
-    if(Constants.LEFTJOY.getRawButtonPressed(2)) {
+    if(Constants.LEFTJOY.getRawButtonPressed(5)) {
       exampleDoublePCM.set(Value.kForward);
       count++;}
   }

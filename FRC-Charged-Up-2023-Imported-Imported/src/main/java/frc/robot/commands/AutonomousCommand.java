@@ -6,12 +6,17 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.PneumaticsSubsystem;
 
-public class DriveRotate extends CommandBase {
+public class AutonomousCommand extends CommandBase {
   DriveSubsystem m_subsystem;
+  PneumaticsSubsystem m_pneu;
+  double step = 0;
   /** Creates a new DriveRotate. */
-  public DriveRotate(DriveSubsystem subsystem) {
+  public AutonomousCommand(DriveSubsystem subsystem, PneumaticsSubsystem pneu) {
     m_subsystem = subsystem;
+    m_pneu = pneu;
+    
     addRequirements(subsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -23,7 +28,15 @@ public class DriveRotate extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.rotateToPoint(90, 2);
+    m_subsystem.driveToPoint(10*12, 0, 0, 5, 5);    
+    if (step == 0 && m_subsystem.timeDrive(0.5, -0.48, false)) {
+      step++;
+    } else if (step == 1 && m_subsystem.timedProfiledDrive(4.2, 0.48, true)) { // Time 3.1 or 6.2
+      step++;
+    } else if (step == 2) {
+      // m_subsystem.driveToPoint(10*12, 0, 0, 5, 5);    
+      m_subsystem.stopDrive();
+    }
   }
 
   // Called once the command ends or is interrupted.

@@ -3,10 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 //import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -15,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.DriveCommand;
-import frc.robot.commands.DriveRotate;
 
 public class DriveSubsystem extends SubsystemBase {
   public CANSparkMax fr, fl, br, bl,ARM;
@@ -23,9 +25,16 @@ public class DriveSubsystem extends SubsystemBase {
   public double s = 0, rot = 0, a = 0.5;
   public DifferentialDrive diffDrive;
   public double x = 0, y = 0, t = 0, fl_0 = 0, fr_0 = 0, bl_0 = 0, br_0 = 0, dt = 0;
-  public Timer time;
+  public Timer time, auto;
   RelativeEncoder[] Encs;
   int drivePhase = 0;
+  double p= 0.03;
+  double i= 0.009;
+  double d= 0.01;
+  double e;
+  public PIDController drivePIDController;
+  public double TestDrive;
+ 
 /*fdshfhdjshfhgtjvddsgsjfhdisjgdfgsdjglsfhdsjfshfsdjiotfds System.Out.Println("L") */
   /** Creates a new ExampleSubsystem. */
   public DriveSubsystem() {
@@ -35,6 +44,9 @@ public class DriveSubsystem extends SubsystemBase {
     br = new CANSparkMax(Constants.BRCAN, MotorType.kBrushless);
     //br.setInverted(true);
     bl = new CANSparkMax(Constants.BLCAN, MotorType.kBrushless);
+    Constants.gyro.calibrate();
+
+    drivePIDController= new PIDController(p, i, d);
     //ARM= new CANSparkMax(Constants.ARMCAN, MotorType.kBrushless);
     //br.setInverted(true);
     //fr.setInverted(true);
@@ -53,6 +65,8 @@ public class DriveSubsystem extends SubsystemBase {
     MotorControllerGroup right= new MotorControllerGroup(fr, br);
 
     left.setInverted(true);
+
+    
 
     flEnc = fl.getEncoder();
     frEnc = fr.getEncoder();
@@ -77,7 +91,55 @@ public class DriveSubsystem extends SubsystemBase {
     
     time = new Timer();
     time.start();
+
   }
+
+  public boolean timeDrive(double time, double pow, boolean end) {
+    if (auto == null) {
+      auto = new Timer();
+      auto.start();
+      return false;
+    } else if (auto.get() < time) {
+      diffDrive.arcadeDrive(-pow, 0);
+      return false;
+    } else {
+      stopDrive();
+      if (!end) {auto = null;}
+      return true;
+    }
+  }
+
+  public boolean timedProfiledDrive(double time, double pow, boolean end) {
+    if (auto == null) {
+      auto = new Timer();
+      auto.start();
+      return false;
+    } else if (auto.get() < time) {
+      diffDrive.arcadeDrive(-pow * (1 - (auto.get() / (3 * time))), 0);
+      return false;
+    } else {
+      stopDrive();
+      if (!end) {auto = null;}
+      return true;
+    }
+  }
+
+  public boolean expProfiledDrive(double time, double pow, boolean end) {
+    if (auto == null) {
+      auto = new Timer();
+      auto.start();
+      return false;
+    } else if (auto.get() < time) {
+      diffDrive.arcadeDrive(-pow * 1.5 * (1 - (auto.get() / (3 * time))), 0);
+      return false;
+    } else {
+      stopDrive();
+      if (!end) {auto = null;}
+      return true;
+    }
+  }
+
+
 
 
 
@@ -134,7 +196,7 @@ public class DriveSubsystem extends SubsystemBase {
   public boolean rotateToPoint(double setT, double tolerance) {
     setT = Math.toRadians(setT);
     tolerance = Math.toRadians(tolerance);
-    double e = setT - getT();
+    e = setT - getT();
     e = radAngWrap(e);
     SmartDashboard.putNumber("E", e);
     if (Math.abs(e) > tolerance) {
@@ -154,7 +216,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   
   public void arcadeDrive(){
-    diffDrive.arcadeDrive(Constants.LEFTJOY.getY()*.5, Constants.LEFTJOY.getX()*.5);
+    double p = 1;
+    if (Constants.LEFTJOY.getRawButton(2)) {
+      p = 0.5;
+    }
+    diffDrive.arcadeDrive(p*Constants.LEFTJOY.getY(), p*Constants.LEFTJOY.getX());
     
     //fr.set(Constants.LEFTJOY.getY());
   }
@@ -216,10 +282,10 @@ public void stateUpdater() {
   double bl_1 = (lowPassFilter(1, blEnc.getPosition(), bl_0) - bl_0)/dt;
   double br_1 = (lowPassFilter(1, brEnc.getPosition(), br_0) - br_0)/dt;
 
-  SmartDashboard.putNumber("FL", flEnc.getPosition());
-  SmartDashboard.putNumber("FR", frEnc.getPosition());
-  SmartDashboard.putNumber("BL", blEnc.getPosition());
-  SmartDashboard.putNumber("BR", brEnc.getPosition());
+  // SmartDashboard.putNumber("FL", flEnc.getPosition());
+  // SmartDashboard.putNumber("FR", frEnc.getPosition());
+  // SmartDashboard.putNumber("BL", blEnc.getPosition());
+  // SmartDashboard.putNumber("BR", brEnc.getPosition());
 
   double x_dot = Constants.DRIVE_InTk*((fl_1 + bl_1) - (br_1 + fr_1)) / (4);
   //double y_dot = 0; //Constants.DRIVE_R*(fl_1 - bl_1 + br_1 - fr_1) / 4;
@@ -255,6 +321,8 @@ public void stateUpdater() {
     stateUpdater();
   }
 
+
+
   public double getX() {
       return x;
   }
@@ -271,8 +339,32 @@ public void stateUpdater() {
     return Math.toDegrees(t);
 }
 
+public void jadenSmithPlus(double target){
+  // double kP = 0.1;
+  // double e = target - Constants.gyro.getYaw();
+  // if(Math.abs(e) > 5){ 
+  //   diffDrive.arcadeDrive(0, kP*e);
+  // } else {
+  //   diffDrive.arcadeDrive(0, 0);
+  // }
+
+ TestDrive = MathUtil.clamp(drivePIDController.calculate(Constants.gyro.getYaw(), target), -0.5, 0.5);
+  diffDrive.arcadeDrive(0, TestDrive);
+  
+}
+
+public double getDriveError(){
+  return e;
+}
+
+public double getTestDrive(){
+  return TestDrive;
+}
+
+
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
+
 }

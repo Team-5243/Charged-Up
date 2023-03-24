@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
@@ -34,17 +36,26 @@ public final class Constants {
     public static double KP_DRIVE_R = 1;
     public static double KP_DRIVE_X = 1;
 
-    public static double KP_ARM = 0.05;
-    public static double KS_ARM = 0.2;
-    public static double KP_EXTEND = 0.05;
+    public static double KP_ARM = 1;
+    public static double KI_ARM = 0.0002;
+    public static double KD_ARM = 0.85;
+    public static double ARM_KIZ = 0;
+    public static double ARM_KMAX = 0.7;
+    public static double ARM_KMIN = -0.2;
+    public static double ARM_MAXRPM = 5000;
+    public static double ARM_KFF= 0.1;
+
+
+    public static double KS_ARM = 1;
+    public static double KP_EXTEND = 0.1;
     public static double KS_EXTEND = 0.2;
     public static double ARM_CONTROL_SCALAR = 5;
     public static double ARM_DEG_TOL = 5;
     public static double EXTEND_CONTROL_SCALAR = 5;
     public static double EXTEND_DEG_TOL = 5;
-    public static double ARM_LIMIT = 90;
+    public static double ARM_LIMIT = 15;
     public static double EXTENT_LIMIT = 180;
-    public static double ARM_KS= 0.13/360;
+    public static double ARM_KS= 10/360;
 
 
     // Robot Physical Constants
@@ -53,4 +64,13 @@ public final class Constants {
     public static double DRIVE_R_GR = 8.5; // inches
     public static double DRIVE_InTk = 53./24; // inches
     public static double DRIVE_TRACT = 19; // inches
+    public static double EXT__DEG_MIN = -95; // degrees
+    public static double EXT__DEG_MAX = 640; // degrees
+    public static double rightAngleArm= 45;// ticks
+
+    public static double driveTolerance= 5;
+    public static AHRS gyro = new AHRS();
+
+
+
 }

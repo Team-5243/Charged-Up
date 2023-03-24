@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class ArmCommand extends CommandBase {
@@ -23,18 +24,28 @@ public class ArmCommand extends CommandBase {
   @Override
   public void initialize() {
     m_subsystem.EncZeroer();
+    m_subsystem.setArmPosition(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.armController();
+    //m_subsystem.PIDArmController();
     m_subsystem.extendController();
-    m_subsystem.perfect45();
-    m_subsystem.EncZeroer();
-    SmartDashboard.putNumber("Arm Degree Position", m_subsystem.getArmDegPos());
-    SmartDashboard.putNumber("Extension Degree Position", m_subsystem.getExtendDegPos());
-    SmartDashboard.putNumber("Power Set to ARm", m_subsystem.getArmPower());
+    m_subsystem.armController();
+    // m_subsystem.retractedReset();
+    // m_subsystem.extendedReset();
+    SmartDashboard.putNumber("Arm Degree Position", m_subsystem.getArmDegPos()*42./360);
+    SmartDashboard.putNumber("Arm Target Pos", m_subsystem.getArmTarget());
+    SmartDashboard.putNumber("Arm Position", m_subsystem.getArmPos());
+    //SmartDashboard.putNumber("Extension Degree Position", m_subsystem.getExtendDegPos());
+    SmartDashboard.putNumber("Extension Position", m_subsystem.getExtendPos());
+    SmartDashboard.putNumber("Power Set to Arm", m_subsystem.getArmPower());
+    SmartDashboard.putNumber("kP", Constants.KP_ARM);
+    SmartDashboard.putNumber("kI", Constants.KI_ARM);
+    SmartDashboard.putNumber("kD", Constants.KD_ARM);
+    SmartDashboard.putNumber("Error", m_subsystem.getError());
+    m_subsystem.livePIDTuner();
   }
 
   // Called once the command ends or is interrupted.

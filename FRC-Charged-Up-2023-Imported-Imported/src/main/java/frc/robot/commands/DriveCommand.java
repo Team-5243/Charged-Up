@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -13,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class DriveCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final DriveSubsystem m_subsystem;
-
+  public double drive90Help= Constants.gyro.getYaw();
   /**
    * Creates a new ExampleCommand.
    *
@@ -28,7 +29,8 @@ public class DriveCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_subsystem.resetPos();
+    m_subsystem.resetPos(); 
+    Constants.gyro.zeroYaw();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -36,14 +38,44 @@ public class DriveCommand extends CommandBase {
   public void execute() {
     if (Constants.LEFTJOY.getRawButton(6)) {
       m_subsystem.driveToPoint(12*10, 0, 0, 6, 5);
+    // } else if(Constants.LEFTJOY.getRawButtonPressed(11)){
+    //     while(m_subsystem.getDriveError()>5){
+    //       m_subsystem.jadenSmithPlus(drive90Help+90);
+    //     }
+    // }else if(Constants.LEFTJOY.getRawButtonReleased(11)){
+    //    drive90Help+=90;
+    //    if(drive90Help>=360){
+    //     drive90Help-=360;
+    //   } else if(drive90Help<=0){
+    //     drive90Help+=360;
+    //   }
     } else {
-      m_subsystem.arcadeDrive();
+      if(Constants.LEFTJOY.getRawButtonPressed(11)){
+        drive90Help+=90;
+        if((drive90Help)>=180){
+          drive90Help*=-1;
+          drive90Help+=180;
+        }
+      } else if(Constants.LEFTJOY.getRawButton(11)){
+        m_subsystem.jadenSmithPlus(drive90Help);
+      } else{
+        m_subsystem.arcadeDrive(); 
+      }
     }
+
+      SmartDashboard.putString("yaw", Constants.gyro.getYaw()+"");
+      SmartDashboard.putString("pitch", Constants.gyro.getPitch()+"");
+      SmartDashboard.putString("roll", Constants.gyro.getRoll()+"");
+      SmartDashboard.putString("error", m_subsystem.getDriveError()+"");
+      SmartDashboard.putString("targetAngleDrive", drive90Help+"");
+      SmartDashboard.putString("targetDrive", m_subsystem.getTestDrive()+"");
+      
+      // }
     //m_subsystem.armMoveBetter();
     //m_subsystem.leftPivot();
-    SmartDashboard.putNumber("X", m_subsystem.getX());
-    SmartDashboard.putNumber("Y", m_subsystem.getY());
-    SmartDashboard.putNumber("T", m_subsystem.getTDeg());
+    // SmartDashboard.putNumber("X", m_subsystem.getX());
+    // SmartDashboard.putNumber("Y", m_subsystem.getY());
+    // SmartDashboard.putNumber("T", m_subsystem.getTDeg());
   }
 
   // Called once the command ends or is interrupted.
